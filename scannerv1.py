@@ -12,6 +12,7 @@
 import cv2 as cv
 import sys
 import copy
+import numpy as np
 
 def sortByArea(contour):
     return cv.contourArea(contour)
@@ -24,9 +25,15 @@ def transform(document):
     contours.sort(key = sortByArea)
     #cv.drawContours(document, contours, (len(contours) - 1), (0, 0, 255), 10)
     possibleDocument = contours[-1]
-    
+
     epsilon = 0.1*cv.arcLength(possibleDocument,True)
     approx = cv.approxPolyDP(possibleDocument,epsilon,True)
+    print(approx)
+
+    dest = np.float32([[0,0],[4031,0], [0,3023], [4031, 3023]])
+    matrix = cv.getPerspectiveTransform(np.float32([approx[0], approx[3], approx[1], approx[2]]), dest)
+    
+    document = cv.warpPerspective(document, matrix, (4031, 3023))
 
     return document
 
