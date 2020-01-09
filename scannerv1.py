@@ -22,8 +22,12 @@ def transform(document):
     _, documentCopy = cv.threshold(documentCopy, 180, 255, cv.THRESH_BINARY+cv.THRESH_OTSU)
     contours, hierarchy = cv.findContours(documentCopy, cv.RETR_TREE, cv.CHAIN_APPROX_NONE)
     contours.sort(key = sortByArea)
+    #cv.drawContours(document, contours, (len(contours) - 1), (0, 0, 255), 10)
+    possibleDocument = contours[-1]
     
-    cv.drawContours(document, contours, (len(contours) - 1), (0, 0, 255), 10)
+    epsilon = 0.1*cv.arcLength(possibleDocument,True)
+    approx = cv.approxPolyDP(possibleDocument,epsilon,True)
+
     return document
 
 if __name__ == "__main__":
@@ -38,7 +42,7 @@ if __name__ == "__main__":
     document = transform(document)
 
     cv.namedWindow('final', cv.WINDOW_NORMAL)
-    cv.resizeWindow('final', 640, 480)
+    cv.resizeWindow('final', 800, 600)
     
     # Display
     cv.imshow('final', document)
